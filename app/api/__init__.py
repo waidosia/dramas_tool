@@ -4,6 +4,7 @@ from app.api.info import img_host_api
 from app.api.info import pt_gen_api
 from app.api.info import screenshot_api
 from app.api.info import site_api
+from app.api.publish import rename_api
 from app.api.upload import upload_api
 DEFAULT_BLUEPRINT = [
     (info_api, '/api/info'),
@@ -13,6 +14,7 @@ DEFAULT_BLUEPRINT = [
     (screenshot_api, '/api/screenshot'),
     (site_api, '/api/site'),
     (upload_api, '/api/upload'),
+    (rename_api, '/api/rename'),
 
 ]
 

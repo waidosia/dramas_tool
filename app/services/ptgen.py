@@ -4,21 +4,6 @@ import requests
 
 import logging
 
-
-genre_type = {
-    "剧情" : "1",
-    "爱情":"2" ,
-    "穿越":"3" ,
-    "重生":"4" ,
-    "逆袭":"5",
-    "都市":"6" ,
-    "喜剧":"7" ,
-    "科幻":"8" ,
-}
-
-
-
-
 def fetch_ptgen_data(api_url, resource_url) -> dict:
     douban_info = {}
     retry_count = 0
@@ -43,7 +28,7 @@ def fetch_ptgen_data(api_url, resource_url) -> dict:
                 # 语言: data['language']
                 douban_info['language'] = data.get('language',[])
                 # 类型: data['genre']
-                douban_info['genre'] = genre_conversion(data.get('genre',{}))
+                douban_info['genre'] = data.get('genre',{})
                 return {'code': 200, 'data': douban_info}
         except Exception as e:
             retry_count += 1
@@ -62,12 +47,3 @@ def format_conversion(text) -> str:
         return cleaned_format
     return text
 
-
-def genre_conversion(genre) -> []:
-    new_genre = []
-    for element in genre:
-        if element in genre_type:
-            new_genre.append(genre_type[element])
-        else:
-            continue
-    return new_genre

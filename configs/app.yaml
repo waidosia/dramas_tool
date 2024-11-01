@@ -9,5 +9,5 @@ database:
   commit_on_teardown: true
 
 setting:
-  path: 'D:\\Tools'
+  path: 'D:\\BaiduNetdiskDownload'
 

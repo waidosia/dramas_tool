@@ -2,42 +2,87 @@
 import os
 import logging
 import re
-from moviepy.editor import VideoFileClip
+import shutil
 
+from pymediainfo import MediaInfo
 
+from utils.festival import get_festival_blessing
 
-# 生成标准文件命名
-# file_name = f"{first_chinese_name}.{first_english_name}.{year} S{season}E??.{width}.{source}.{format}.{hdr_format}.{commercial_name}{channel_layout}-{team}"
-# 生成标准文件夹命名
-# folder_name = f"{first_chinese_name}.{first_english_name}.{year} S{season}.{width}.{source}.{format}.{hdr_format}.{commercial_name}{channel_layout}-{team}"
 # 标准命名,返回文件夹的名称
-def standard_name(folder_path,cnName,enName,year,season,team):
+def standard_name(folder_path,cnName,enName,year,season,category,source,film_source='WEB-DL',team='GodDramas'):
     # 获取第一集的信息
+    if season < 10:
+        season = '0' + str(season)
+    festival = get_festival_blessing()
+    file_name = "{cnName}.{enName}.{year}.S{season}E???.{resolution}.{source}.{video_codec}.{audio_codec}-{team}"
+    folder_name = "{cnName}.{enName}.{year}.S{season}.{resolution}.{source}.{video_codec}.{audio_codec}-{team}"
     video_files = get_video_files(folder_path)
     if len(video_files) == 0:
         return ''
     # 选择第一个视频，获取长宽
+    video_info = get_video_info(video_files[0])
+    if video_info is None:
+        return ''
+    file_name = file_name.format(cnName=cnName,enName=enName,year=year,season=season,
+                                 resolution=video_info['resolution'],source=film_source,video_codec=video_info['video_codec'],
+                                 audio_codec=video_info['audio_codec'],team=team)
+    folder_name = folder_name.format(cnName=cnName, enName=enName, year=year, season=season,
+                                   resolution=video_info['resolution'],source=film_source,video_codec=video_info['video_codec'],
+                                   audio_codec=video_info['audio_codec'],team=team)
+    main_title = folder_name.replace('.',' ')
+    second_title = f"{cnName} | 全{len(video_files)}集 | {year}年 | {source} | 类型：{'/'.join(category)} {festival} "
+    # 获取所有的视频文件，提取集数，拼接新名称，重命名
+    video_files =  rename_video_files(video_files,file_name)
+    if len(video_files) == 0:
+        return {}
+    # 重命名文件夹，返回新文件夹名称
+    new_folder_path = rename_directory(folder_path,folder_name)
+    return {
+        'new_folder_path': new_folder_path,
+        'first_file_name': video_files[0],
+        'main_title' : main_title,
+        'second_title' : second_title,
+    }
+
+
 
 
 
 def get_video_info(video_path):
-    with VideoFileClip(video_path) as video:
-        width = video.w
-        height = video.h
-        # 取较小值来处理横竖屏
+    media_info = MediaInfo.parse(video_path)
+    video_codec = None
+    audio_codec = None
+    width = None
+    height = None
+
+    for track in media_info.tracks:
+        if track.track_type == 'Video':
+            width = track.width
+            height = track.height
+            # 检测 x264 关键字
+            if 'x264' in track.writing_library:
+                video_codec = 'x264'  # 检测到 x264
+            else:
+                video_codec = track.format
+        elif track.track_type == 'Audio':
+            audio_codec = track.format
+
+        elif track.track_type == 'Audio':
+            audio_codec = track.format
+
+    # 确定分辨率格式
+    if width and height:
         min_dimension = min(width, height)
-        # 格式化分辨率为 xxxP
-        resolution_str = f"{min_dimension}P"
-        resolution = (width, height)
-        # video_codec = video.reader.codec
-        # audio_codec = video.audio.codec if video.audio else None
+        resolution_str = f"{min_dimension}p"
+    else:
+        resolution_str = None
 
     return {
         "width": width,
         "height": height,
-        "resolution":   resolution_str,
-        # "video_codec": video_codec,
-        # "audio_codec": audio_codec,
+        "resolution": resolution_str,
+        "video_codec": video_codec,
+        "audio_codec": audio_codec,
     }
 
 
@@ -81,7 +126,7 @@ def rename_video_files(video_files, file_name) -> list:
             logging.error("提取集数失败，退出")
             return []
         episode_number = str(episode_number).zfill(len(str(len(video_files))))
-        renamed_file = rename_file_with_same_extension(video_file, file_name.replace('??', episode_number))
+        renamed_file = rename_file_with_same_extension(video_file, file_name.replace('???',episode_number))
         if renamed_file is not None:
             renamed_files.append(renamed_file)
     return renamed_files
@@ -105,27 +150,16 @@ def rename_file_with_same_extension(old_name, new_name_without_extension):
 
     file_dir, file_base = os.path.split(old_name)
     file_name, file_extension = os.path.splitext(file_base)
-    new_name = os.path.join(file_dir, new_name_without_extension + file_extension)
-    os.rename(old_name, new_name)
+    new_name = str(os.path.join(file_dir, new_name_without_extension + file_extension))
+    shutil.move(old_name, new_name)
     logging.info(f"{old_name} 文件成功重命名为 {new_name}")
     return str(new_name)
-
-
-def rename_directory_if_needed(video_path, file_name) -> str:
-    directory_path = os.path.dirname(video_path)
-    if 'E??' in file_name:
-        rename_dir = rename_directory(directory_path, file_name.replace('E??', ''))
-        return rename_dir
 
 
 def rename_directory(current_dir, new_name):
     if not os.path.exists(current_dir) or not os.path.isdir(current_dir):
         return ''
     parent_dir = os.path.dirname(current_dir)
-    new_dir = os.path.join(parent_dir, new_name)
-    os.rename(current_dir, new_dir)
+    new_dir = str(os.path.join(parent_dir, new_name))
+    shutil.move(current_dir, new_dir)
     return str(new_dir)
-
-if __name__ == '__main__':
-    info = get_video_info(r"D:\BaiduNetdiskDownload\16.庆余年之帝王业（52集）舒童 李子峰\1.mp4")
-    print(info)
