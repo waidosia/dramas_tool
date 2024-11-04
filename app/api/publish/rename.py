@@ -13,7 +13,7 @@ def rename():
     if data is None:
         return util.json_params_error("参数错误")
     res = standard_name(data['videoFolder'],data['cnName'],data['enName'],data['year'],
-                  data['season'],data['category'],data['source'],data['film_source'],data['group'])
+                  data['season'],data['category'],data['source'],data['filmSource'],data['team'])
     if res is None:
         return util.json_server_error("服务器错误")
     print(res)

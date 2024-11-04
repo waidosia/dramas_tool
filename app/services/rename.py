@@ -38,10 +38,10 @@ def standard_name(folder_path,cnName,enName,year,season,category,source,film_sou
     # 重命名文件夹，返回新文件夹名称
     new_folder_path = rename_directory(folder_path,folder_name)
     return {
-        'new_folder_path': new_folder_path,
-        'first_file_name': video_files[0],
-        'main_title' : main_title,
-        'second_title' : second_title,
+        'newFolderPath': new_folder_path,
+        'firstFileName': video_files[0],
+        'mainTitle' : main_title,
+        'subTitle' : second_title,
     }
 
 

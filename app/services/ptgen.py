@@ -20,7 +20,7 @@ def fetch_ptgen_data(api_url, resource_url) -> dict:
                 # 简介: data['introduction']
                 douban_info['introduction'] = data.get('introduction','')
                 # 中文名: data['chinese_title']
-                douban_info['chinese_title'] = data.get('chinese_title','')
+                douban_info['cnName'] = data.get('chinese_title','')
                 # 年份: data['year']
                 douban_info['year'] = data.get('year','')
                 # 地区: data['中国大陆']
@@ -28,7 +28,7 @@ def fetch_ptgen_data(api_url, resource_url) -> dict:
                 # 语言: data['language']
                 douban_info['language'] = data.get('language',[])
                 # 类型: data['genre']
-                douban_info['genre'] = data.get('genre',{})
+                douban_info['category'] = data.get('genre',{})
                 return {'code': 200, 'data': douban_info}
         except Exception as e:
             retry_count += 1

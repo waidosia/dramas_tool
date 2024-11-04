@@ -82,3 +82,44 @@ CREATE TABLE IF NOT EXISTS configuration(
 
 INSERT OR IGNORE INTO configuration(id ,image_host_id, pt_gen_id, screenshot_id, downloader_id, is_transfer, transfer_dir, proxy_url, torrent_path)
 VALUES (1,1,1,1,0,false,'','','')
+
+CREATE TABLE IF NOT EXISTS publish_history(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cn_name TEXT NOT NULL,
+    en_name TEXT NOT NULL,
+    year INTEGER NOT NULL,
+    season INTEGER NOT NULL,
+    film_source TEXT NOT NULL,
+    source TEXT NOT NULL,
+    team TEXT NOT NULL,
+    cover TEXT NOT NULL,
+    pt_gen TEXT,
+    introduction TEXT NOT NULL,
+    category TEXT NOT NULL,
+    main_title TEXT NULL,
+    sub_title TEXT NULL ,
+    torrent_path TEXT NULL,
+    torrent BLOB,
+    screenshot1_link TEXT NULL,
+    screenshot2_link TEXT NULL,
+    screenshot3_link TEXT NULL,
+    screenshot4_link TEXT NULL,
+    screenshot5_link TEXT NULL,
+    video_screenshot_link  TEXT NULL,
+    publish_info  TEXT NULL,
+    mediaInfo  TEXT NULL,
+    reference TEXT NULL,
+    group_icon TEXT NULL,
+    videoInfo_icon TEXT NULL,
+    screenshot_icon TEXT NULL,
+    first_file_name TEXT NULL
+);
+
+CREATE TABLE IF NOT EXISTS  publish_by_site(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    publish_id INTEGER NOT NULL,
+    site_type INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    error_msg TEXT NULL,
+    torrent_id INTEGER NULL
+);

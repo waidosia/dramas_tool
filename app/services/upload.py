@@ -5,8 +5,8 @@ from io import BytesIO
 import requests
 from bs4 import BeautifulSoup
 from requests import RequestException
-from PIL import Image
-import uuid
+
+from utils.filename import send_file_name, get_pic_type
 
 global token
 
@@ -196,14 +196,3 @@ def get_token(url, cookie):
             token = href.split("auth_token=")[-1]
             return token
     return ''
-
-
-def get_pic_type(file_stream):
-    try:
-        img = Image.open(BytesIO(file_stream))
-        return img.format if img.format else "jpeg"
-    except IOError:
-        return "unknown"
-
-def send_file_name():
-    return uuid.uuid4().hex
