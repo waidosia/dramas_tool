@@ -8,9 +8,6 @@ import numpy as np
 from utils import filename
 
 
-
-
-
 def extract_complex_keyframes(video_path, output_path, num_images, some_threshold, start_pct, end_pct, min_interval_pct=0.01):
 
     os.makedirs(output_path, exist_ok=True)
@@ -126,15 +123,3 @@ def get_thumbnails(video_path, output_path, cols, rows, start_pct, end_pct):
 
     print(f"拼接后的图像已保存到{sv_path}")
     return True, sv_path
-
-
-if __name__ == '__main__':
-    extract_complex_keyframes(r"D:\BaiduNetdiskDownload\神级赘婿.Shen.Ji.Zhui.Xu.2023.S01E001.720p.WEB-DL.AVC.AAC-GodDramas.mp4",
-                   r"./tmp/pic",
-                   3,0.02,
-                   0.12,0.92)
-    # get_thumbnails(r"D:\BaiduNetdiskDownload\神级赘婿.Shen.Ji.Zhui.Xu.2023.S01E001.720p.WEB-DL.AVC.AAC-GodDramas.mp4",
-    #                r"./tmp/pic",
-    #                4,4,
-    #                0.12,0.92
-    #                )

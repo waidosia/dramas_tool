@@ -1,7 +1,3 @@
-import time
-
-
-
 from app import create_app, Config
 from flask_cors import CORS
 

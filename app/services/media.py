@@ -74,7 +74,7 @@ def get_media_info(file_path):
 
     if not os.path.exists(file_path):
         logging.error("文件路径不存在")
-        return False, "视频文件路径不存在"
+        return ""
 
     original_working_directory = os.getcwd()
     parent_directory = os.path.abspath(os.path.join(file_path, os.pardir))
@@ -92,15 +92,15 @@ def get_media_info(file_path):
             if track_type in TRACK_ATTRIBUTES:
                 output += handle_track(track, track_type)
 
-        return True, output
+        return output
 
     except OSError as e:
         logging.error(f"文件路径错误: {e}")
-        return False, f"文件路径错误: {e}"
+        return ""
 
     except Exception as e:
         logging.error(f"无法解析文件: {e}")
-        return False, f"无法解析文件: {e}"
+        return ""
 
     finally:
         os.chdir(original_working_directory)
@@ -116,5 +116,5 @@ def handle_track(track, track_type):
         if value is not None:
             output += f"{label:36}: {value}\n"
 
-    output += "\n" + "-" * 50 + "\n\n"
+    output +=  "\n"
     return output

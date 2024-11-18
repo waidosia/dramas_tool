@@ -204,10 +204,19 @@ Content-Type: application/json
     "transfer_dir": ""
 }
 
+###
+POST http://127.0.0.1:5000/api/torrent
+Content-Type: application/json
 
-### 测试websocket
-WEBSOCKET ws://127.0.0.1:5000/ws/logs
+{
+    "videoFolder": "D:\\\\BaiduNetdiskDownload\\R-人中之凤（68集）姚宇晨\\人中之凤.ren.zhong.zhi.feng.2024.S01.608p.WEB-DL.AVC.AAC-GodDramas"
+}
 
 
-### 测试消息推送
-GET http://127.0.0.1:5000/api/info/111?text=123456
+###
+POST http://127.0.0.1:5000/api/publish
+Content-Type: application/json
+
+{
+    "videoFolder": "D:\\\\BaiduNetdiskDownload\\R-人中之凤（68集）姚宇晨\\人中之凤.ren.zhong.zhi.feng.2024.S01.608p.WEB-DL.AVC.AAC-GodDramas"
+}

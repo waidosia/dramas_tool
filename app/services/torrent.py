@@ -13,18 +13,20 @@ def create_torrent(folder_path, torrent_path) -> str:
     torrent_file_name = os.path.basename(folder_path.rstrip("/\\")) + '.torrent'
     torrent_file_path = os.path.join(torrent_path, torrent_file_name)
 
+    torrent_truth_path = os.path.join(os.getcwd(), torrent_file_name)
+
     # 确保torrent文件的目录存在
-    os.makedirs(os.path.dirname(torrent_file_path), exist_ok=True)
+    os.makedirs(os.path.dirname(torrent_truth_path), exist_ok=True)
 
     # 如果目标 Torrent 文件已存在，则删除它
-    if os.path.exists(torrent_file_path):
-        os.remove(torrent_file_path)
+    if os.path.exists(torrent_truth_path):
+        os.remove(torrent_truth_path)
 
     # 创建 Torrent 对象
     t = Torrent(path=folder_path, trackers=[''])
 
     # 生成和写入 Torrent 文件
     t.generate()
-    t.write(torrent_file_path)
+    t.write(torrent_truth_path)
 
     return str(torrent_file_path)

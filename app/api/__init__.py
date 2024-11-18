@@ -1,10 +1,11 @@
-from app.api.info import info_api
+from app.api.download import download_api
+from app.api.info import info_api, torrent_api, media_api
 from app.api.info import downloader_api
 from app.api.info import img_host_api
 from app.api.info import pt_gen_api
 from app.api.info import screenshot_api
 from app.api.info import site_api
-from app.api.publish import rename_api
+from app.api.publish import rename_api, publish_api
 from app.api.upload import upload_api
 DEFAULT_BLUEPRINT = [
     (info_api, '/api/info'),
@@ -15,6 +16,10 @@ DEFAULT_BLUEPRINT = [
     (site_api, '/api/site'),
     (upload_api, '/api/upload'),
     (rename_api, '/api/rename'),
+    (torrent_api, '/api/torrent'),
+    (download_api, '/api/download'),
+    (media_api, '/api/media'),
+    (publish_api, '/api/publish'),
 
 ]
 
