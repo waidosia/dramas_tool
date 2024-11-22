@@ -14,19 +14,17 @@ def extract_complex_keyframes(video_path, output_path, num_images, some_threshol
     # 加载视频
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        print("无法加载视频。")
-        return False, ["无法加载视频。"]
+        return ''
 
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     duration = total_frames / fps
-    print("加载视频成功")
 
     # 计算起止时间帧编号
     start_frame = int(total_frames * start_pct)
     end_frame = int(total_frames * end_pct)
     min_interval = duration * min_interval_pct
-    print(f"起止帧：{start_frame} 终止帧：{end_frame} 最小帧间隔：{min_interval}")
+
 
     # 初始化变量
     extracted_images = []
@@ -45,7 +43,6 @@ def extract_complex_keyframes(video_path, output_path, num_images, some_threshol
         current_time = timestamp / fps
         if current_time >= last_keyframe_time + min_interval:
             std_dev = np.std(frame)
-            print(f"Frame ID: {timestamp}, Timestamp: {current_time:.2f}, Std Dev: {std_dev:.2f}")
 
             if std_dev > some_threshold:
                 frame_path = os.path.join(output_path, f"{timestamp}.png")
@@ -54,8 +51,7 @@ def extract_complex_keyframes(video_path, output_path, num_images, some_threshol
                 last_keyframe_time = current_time
 
     cap.release()
-    print(extracted_images)
-    return True, extracted_images
+    return extracted_images
 
 
 

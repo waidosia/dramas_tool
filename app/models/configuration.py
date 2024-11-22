@@ -144,3 +144,4 @@ class Config(db.Model):
             'proxy_url': self.proxy_url,
             'torrent_path': self.torrent_path
         }
+
