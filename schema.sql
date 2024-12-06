@@ -85,7 +85,8 @@ VALUES (1,1,1,1,0,false,'','','')
 
 CREATE TABLE IF NOT EXISTS publish_history(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    cn_name TEXT NOT NULL,
+    cn_name TEXT NOT NULL constraint publish_history_pk
+            unique,
     en_name TEXT NOT NULL,
     year INTEGER NOT NULL,
     season INTEGER NOT NULL,
@@ -109,9 +110,6 @@ CREATE TABLE IF NOT EXISTS publish_history(
     publish_info  TEXT NULL,
     mediaInfo  TEXT NULL,
     reference TEXT NULL,
-    group_icon TEXT NULL,
-    videoInfo_icon TEXT NULL,
-    screenshot_icon TEXT NULL,
     first_file_name TEXT NULL
 );
 

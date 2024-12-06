@@ -5,12 +5,22 @@ from io import BytesIO
 import requests
 from bs4 import BeautifulSoup
 from requests import RequestException
+from requests.adapters import HTTPAdapter
+from urllib3 import Retry
 
 from utils.filename import send_file_name, get_pic_type
 
 global token
 
 proxies = {}
+
+def create_session():
+    session = requests.Session()
+    retries = Retry(total=3, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504])
+    adapter = HTTPAdapter(max_retries=retries)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
 
 
 # 二次封装，把upload_screenshot函数封装成一个公共函数，在函数里调用不同的上传图床API
@@ -47,12 +57,14 @@ def lsky_pro_upload(imageHost,content):
     if imageHost.key_or_cookie != '':
         headers['Authorization'] = imageHost.key_or_cookie
 
+    session = create_session()
+
     res = None
     retry_count = 0
     while retry_count < 3:
         try:
             # 发送POST请求
-            res = requests.post("{}/api/v1/upload".format(imageHost.url),files=files,data={},headers=headers,proxies=proxies)
+            res = session.post("{}/api/v1/upload".format(imageHost.url),files=files,data={},headers=headers,proxies=proxies)
             logging.info("已成功发送上传图床的请求")
             break
         except RequestException as e:
@@ -94,9 +106,10 @@ def pter_upload(imageHost,content):
     data = {'type': 'file', 'action': 'upload', 'nsfw': 0, 'auth_token': auth_token}
     req = None
     retry_count = 0
+    session = create_session()
     while retry_count < 3:
         try:
-            req = requests.post(f'{imageHost.url}/json', data=data, files=files, headers=headers, proxies=proxies)
+            req = session.post(f'{imageHost.url}/json', data=data, files=files, headers=headers, proxies=proxies)
             logging.info(req.text)
             break
         except Exception as r:
@@ -132,11 +145,12 @@ def pixhost_upload(imageHost,content):
     headers = {'Accept': 'application/json'}
     res = None
     retry_count = 0
+    session = create_session()
     while retry_count < 3:
         try:
             # 发送POST请求
             logging.info("开始发送上传图床的请求")
-            res = requests.post(imageHost.url, headers=headers, data=data, files=files,proxies=proxies)
+            res = session.post(imageHost.url, headers=headers, data=data, files=files,proxies=proxies)
             break
         except RequestException as e:
             logging.error("请求过程中出现错误:" + str(e))
@@ -172,9 +186,10 @@ def get_token(url, cookie):
                       'Chrome/99.0.4844.51 Safari/537.36'}
     response = None
     retry_count = 0
+    session = create_session()
     while retry_count < 3:
         try:
-            response = requests.get(url=url, headers=headers, proxies=proxies, timeout=10)
+            response = session.get(url=url, headers=headers, proxies=proxies, timeout=10)
             break
         except Exception as r:
             logging.error(f'获取token失败，原因:{r}')
