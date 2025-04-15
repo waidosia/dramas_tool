@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS  publish_by_site(
 
 -- 任务主表
 CREATE TABLE IF NOT EXISTS tasks (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     status INTEGER, -- 0created / 1running / 2completed / 3failed
     form_data TEXT, -- JSON 表单数据
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 -- 日志表（每个任务多个步骤）
 CREATE TABLE IF NOT EXISTS task_logs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    task_id TEXT NOT NULL,
+    task_id INTEGER NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     level TEXT, -- INFO / SUCCESS / ERROR
     step TEXT,  -- 如 rename / torrent / screenshot / etc
