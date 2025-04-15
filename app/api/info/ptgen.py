@@ -63,10 +63,8 @@ def send_ptgen():
     ptgen = PtGen.query.get(configuration.pt_gen_id)
     if ptgen is None or not ptgen.is_available:
         return util.json_params_error("找不到指定的PTGEN或PTGEN不可用，联系管理员吧")
-    res = fetch_ptgen_data(ptgen.url,data['url'])
-    if res['code'] == 200:
-        return json_success("成功",res['data'])
-    elif res['code'] == 400:
-        return json_success("上传失败")
+    success,res = fetch_ptgen_data(ptgen.url,data['url'])
+    if success:
+        return json_success("成功",res)
     else:
         return json_server_error("服务器内部错误")

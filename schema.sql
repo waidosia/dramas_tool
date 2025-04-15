@@ -121,3 +121,23 @@ CREATE TABLE IF NOT EXISTS  publish_by_site(
     error_msg TEXT NULL,
     torrent_id INTEGER NULL
 );
+
+-- 任务主表
+CREATE TABLE IF NOT EXISTS tasks (
+    id TEXT PRIMARY KEY,
+    status INTEGER, -- 0created / 1running / 2completed / 3failed
+    form_data TEXT, -- JSON 表单数据
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 日志表（每个任务多个步骤）
+CREATE TABLE IF NOT EXISTS task_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    level TEXT, -- INFO / SUCCESS / ERROR
+    step TEXT,  -- 如 rename / torrent / screenshot / etc
+    message TEXT,
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);

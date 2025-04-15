@@ -24,7 +24,7 @@ def create_session():
 
 
 # 二次封装，把upload_screenshot函数封装成一个公共函数，在函数里调用不同的上传图床API
-def upload_screenshot(imageHost,content,proxyUrl):
+def upload_screenshot(imageHost,content,proxyUrl) -> (bool, str):
     global proxies
 
     if imageHost.is_proxy is True and proxyUrl != '':
@@ -43,7 +43,7 @@ def upload_screenshot(imageHost,content,proxyUrl):
     else:
         # 暂不支持
         logging.error("未知图床")
-        return {'code':'404','url':''}
+        return False,''
 
 
 # 兰空图床
@@ -74,16 +74,16 @@ def lsky_pro_upload(imageHost,content):
                 logging.info("进行第" + str(retry_count) + "次重试")
             else:
                 logging.error("重试次数已用完")
-                return {'code':500,'url': ''}
+                return False,''
     try:
         api_response = json.loads(res.text)
         if api_response['status']:
-            return {'code':200,'url':api_response['data']['links']['url']}
+            return True,api_response['data']['links']['url']
         else:
-            return {'code': 400, 'url': ''}
+            return False,''
     except json.JSONDecodeError:
         logging.error("响应不是有效的JSON格式")
-        return {'code':500,"url": ''}
+        return False,''
 
 
 
@@ -96,7 +96,7 @@ def pter_upload(imageHost,content):
     auth_token = get_token(imageHost.url, imageHost.key_or_cookie)
     if auth_token == '':
         logging.error('未找到auth_token')
-        return {"code":400,"url": ''}
+        return False, ''
 
     logging.info("开始上传图床")
 
@@ -118,21 +118,21 @@ def pter_upload(imageHost,content):
                 logging.info(f'进行第{retry_count}次重试，错误原因是：{r}', )
             else:
                 logging.error(f'重试次数已用完')
-                return {"code":500,"url": ''}
+                return  False,''
 
     try:
         res = req.json()
         if not req.ok or 'error' in res or 'status_code' in res and res.get('status_code') != 200:
             logging.error("请求过程中出现错误:" + res.text)
-            return {"code":400,"url": ''}
+            return  False,''
         if 'image' not in res or 'url' not in res['image']:
             logging.error(f"图片直链获取失败")
-            return {"code": 400, "url": ''}
-        return  {"code": 200, "url": res['image']['url']}
+            return  False,''
+        return True, res['image']['url']
 
     except json.decoder.JSONDecodeError:
         logging.error("处理返回的JSON过程中出现错误")
-        return {"code":500,"url": ''}
+        return  False,''
 
 
 
@@ -159,19 +159,19 @@ def pixhost_upload(imageHost,content):
                 logging.info("进行第" + str(retry_count) + "次重试")
             else:
                 logging.error("重试次数已用完")
-                return {'code': 500, 'url': ''}
+                return  False,''
 
     try:
         data = json.loads(res.text)
         # 提取所需的URL
         image_url = data["th_url"].replace("//t", "//img").replace("/thumbs/", "/images/")
-        return {"code":200,"url": image_url}
+        return True, image_url
     except KeyError as e:
         logging.error("图床响应结果缺少所需的值：" + str(e))
-        return {"code":400,"url": ''}
+        return  False,''
     except json.JSONDecodeError as e:
         logging.error("处理返回的JSON过程中出现错误：" + str(e))
-        return {"code":500,"url": ''}
+        return  False,''
 
 
 def get_token(url, cookie):

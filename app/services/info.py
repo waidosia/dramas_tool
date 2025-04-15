@@ -11,7 +11,7 @@ def get_all_dir(path) -> (int,list[dict[str, str]]):
     """
     # 判断path是否存在，不存在，则返回err
     if not os.path.isdir(path):
-        return 1,[]
+        return False,[]
     folders = []
     # 递归遍历 root_dir
     for dir_path, dir_names, filenames in os.walk(path):
@@ -22,4 +22,4 @@ def get_all_dir(path) -> (int,list[dict[str, str]]):
                 'name': dirname,
                 'path': folder_path
             })
-    return 0,folders
+    return True,folders

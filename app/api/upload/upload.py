@@ -21,11 +21,9 @@ def upload():
     if img_host is None or not img_host.is_available:
         return util.json_params_error("找不到指定的图床或图床不可用，联系管理员吧")
 
-    res = upload_screenshot(img_host, file.read(),configuration.proxy_url)
-    if res['code'] == 200:
-        return json_success("成功",res['url'])
-    elif res['code'] == 400:
-        return json_success("上传失败")
+    success,res = upload_screenshot(img_host, file.read(),configuration.proxy_url)
+    if success:
+        return json_success("成功",res)
     else:
         return json_server_error("服务器内部错误")
 
@@ -50,11 +48,9 @@ def upload_link():
     if img_host is None or not img_host.is_available:
         return util.json_params_error("找不到指定的图床或图床不可用，联系管理员吧")
 
-    res = upload_screenshot(img_host, content,configuration.proxy_url)
-    if res['code'] == 200:
-        return json_success("成功",res['url'])
-    elif res['code'] == 400:
-        return json_success("上传失败")
+    success,res = upload_screenshot(img_host, content,configuration.proxy_url)
+    if success:
+        return json_success("成功",res)
     else:
         return json_server_error("服务器内部错误")
 

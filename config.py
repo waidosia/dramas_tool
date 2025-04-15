@@ -25,3 +25,6 @@ class Config:
     # 工具自身配置
     PATH = yaml_config['setting']['path']
 
+    # 发种用户
+    USERNAME = yaml_config['user']['name']
+

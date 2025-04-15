@@ -1,19 +1,19 @@
 import os
 from torf import Torrent
 
-def create_torrent(folder_path, torrent_path) -> str:
+def create_torrent(folder_path, torrent_path) -> str|None:
     if not os.path.exists(folder_path):
-        return ''
+        return None
 
     # 检查路径是否指向一个非空目录或一个文件
     if os.path.isdir(folder_path) and not os.listdir(folder_path):
-        return ''
+        return None
 
     # 构造完整的torrent文件路径
     torrent_file_name = os.path.basename(folder_path.rstrip("/\\")) + '.torrent'
     torrent_file_path = os.path.join(torrent_path, torrent_file_name)
 
-    torrent_truth_path = os.path.join(os.getcwd(), torrent_file_name)
+    torrent_truth_path = os.path.join(os.getcwd(), torrent_file_path)
 
     # 确保torrent文件的目录存在
     os.makedirs(os.path.dirname(torrent_truth_path), exist_ok=True)

@@ -4,7 +4,7 @@ import requests
 
 import logging
 
-def fetch_ptgen_data(api_url, resource_url) -> dict:
+def fetch_ptgen_data(api_url, resource_url) -> (bool,dict):
     douban_info = {}
     retry_count = 0
     while retry_count < 3:
@@ -13,6 +13,7 @@ def fetch_ptgen_data(api_url, resource_url) -> dict:
             response = requests.get(f"{api_url}?url={resource_url}", timeout=10)
             if response.status_code == 200:
                 data = response.json()
+                print(data)
                 # 封面: data['poster']
                 douban_info['poster'] = data.get('poster','')
                 # format信息
@@ -29,14 +30,14 @@ def fetch_ptgen_data(api_url, resource_url) -> dict:
                 douban_info['language'] = data.get('language',[])
                 # 类型: data['genre']
                 douban_info['category'] = data.get('genre',{})
-                return {'code': 200, 'data': douban_info}
+                return  True,douban_info
         except Exception as e:
             retry_count += 1
             if retry_count < 3:
                 logging.info(f'进行第{retry_count}次重试，错误原因:{e}')
             else:
                 logging.error(f'重试次数已用完')
-                return {'code':500,'data':None}
+                return False,None
 
 
 def format_conversion(text) -> str:

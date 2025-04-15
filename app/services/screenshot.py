@@ -1,4 +1,4 @@
-import logging
+
 import os
 import random
 
@@ -8,23 +8,24 @@ import numpy as np
 from app.models.configuration import Screenshot, ImageHost
 from app.services.upload import upload_screenshot
 from utils import filename
+from utils.logs import logger
 
 
 def extract_complex_keyframes(video_path,screenshot, min_interval_pct=0.01):
 
-    os.makedirs(screenshot.dir, exist_ok=True)
+    os.makedirs(screenshot.get('dir'), exist_ok=True)
     # 加载视频
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        return ''
+        return False,''
 
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     fps = cap.get(cv2.CAP_PROP_FPS)
     duration = total_frames / fps
 
     # 计算起止时间帧编号
-    start_frame = int(total_frames * screenshot.starting_point)
-    end_frame = int(total_frames * screenshot.end_point)
+    start_frame = int(total_frames * screenshot.get('starting_point'))
+    end_frame = int(total_frames * screenshot.get('end_point'))
     min_interval = duration * min_interval_pct
 
     # 初始化变量
@@ -32,7 +33,7 @@ def extract_complex_keyframes(video_path,screenshot, min_interval_pct=0.01):
     last_keyframe_time = -min_interval
 
     # 生成随机时间戳
-    timestamps = sorted(random.sample(range(start_frame, end_frame), screenshot.num))
+    timestamps = sorted(random.sample(range(start_frame, end_frame), screenshot.get('num')))
 
     for timestamp in timestamps:
         # 跳转到特定帧
@@ -45,40 +46,40 @@ def extract_complex_keyframes(video_path,screenshot, min_interval_pct=0.01):
         if current_time >= last_keyframe_time + min_interval:
             std_dev = np.std(frame)
 
-            if std_dev > screenshot.complexity:
-                frame_path = os.path.join(screenshot.dir, f"{filename.send_file_name()}.png")
+            if std_dev > screenshot.get('complexity'):
+                frame_path = os.path.join(screenshot.get('dir'), f"{filename.send_file_name()}.png")
                 cv2.imwrite(frame_path, frame)
                 extracted_images.append(frame_path)
                 last_keyframe_time = current_time
 
     cap.release()
-    return extracted_images
+    return True , extracted_images
 
 
 
 
 def get_thumbnails(video_path, screenshot):
     video_capture = None
-    os.makedirs(screenshot.dir,exist_ok=True)
+    os.makedirs(screenshot.get('dir'),exist_ok=True)
 
     try:
         video_capture = cv2.VideoCapture(video_path)
 
         if not video_capture.isOpened():
-            return ''
+            return False,''
 
         total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
         # 计算开始和结束帧
-        start_frame = int(total_frames * screenshot.starting_point)
-        end_frame = int(total_frames * screenshot.end_point)
+        start_frame = int(total_frames * screenshot.get('starting_point'))
+        end_frame = int(total_frames * screenshot.get('end_point'))
 
         # 计算每张截取图像的时间间隔
-        interval = (end_frame - start_frame) // (screenshot.thumbnail_horizontal * screenshot.thumbnail_vertical)
+        interval = (end_frame - start_frame) // (screenshot.get('thumbnail_horizontal') * screenshot.get('thumbnail_vertical'))
 
         images = []
 
-        for i, _ in enumerate(range(screenshot.thumbnail_horizontal * screenshot.thumbnail_vertical)):
+        for i, _ in enumerate(range(screenshot.get('thumbnail_horizontal') * screenshot.get('thumbnail_vertical'))):
             frame_number = start_frame + i * interval
             if frame_number >= end_frame:
                 break
@@ -87,38 +88,38 @@ def get_thumbnails(video_path, screenshot):
             ret, frame = video_capture.read()
 
             if not ret:
-                logging.warning(f"无法读取第 {i + 1} 张图像")
+                logger.warning(f"无法读取第 {i + 1} 张图像")
                 continue
 
             images.append(frame)
 
         # 处理图像数量小于预期的情况
-        if len(images) < (screenshot.thumbnail_horizontal * screenshot.thumbnail_vertical):
-            logging.warning(f"只能获取 {len(images)} 张图像，小于预期的 {screenshot.thumbnail_horizontal * screenshot.thumbnail_vertical} 张")
+        if len(images) < (screenshot.get('thumbnail_horizontal') * screenshot.get('thumbnail_vertical')):
+            logger.warning(f"只能获取 {len(images)} 张图像，小于预期的 {screenshot.get('thumbnail_horizontal') * screenshot.get('thumbnail_vertical')} 张")
 
-        resized_images = [cv2.resize(image, (0, 0), fx=1.0 / screenshot.thumbnail_vertical, fy=1.0 / screenshot.thumbnail_vertical) for image in images]
+        resized_images = [cv2.resize(image, (0, 0), fx=1.0 / screenshot.get('thumbnail_vertical'), fy=1.0 / screenshot.get('thumbnail_vertical')) for image in images]
 
         border_size = 5
-        concatenated_image = np.ones((screenshot.thumbnail_horizontal * (resized_images[0].shape[0] + 2 * border_size),
-                                      screenshot.thumbnail_vertical * (resized_images[0].shape[1] + 2 * border_size), 3), dtype=np.uint8) * 255
+        concatenated_image = np.ones((screenshot.get('thumbnail_horizontal') * (resized_images[0].shape[0] + 2 * border_size),
+                                      screenshot.get('thumbnail_vertical') * (resized_images[0].shape[1] + 2 * border_size), 3), dtype=np.uint8) * 255
 
         for i, image in enumerate(resized_images):
-            y_offset = i // screenshot.thumbnail_vertical * (image.shape[0] + 2 * border_size) + border_size
-            x_offset = i % screenshot.thumbnail_vertical * (image.shape[1] + 2 * border_size) + border_size
+            y_offset = i // screenshot.get('thumbnail_vertical') * (image.shape[0] + 2 * border_size) + border_size
+            x_offset = i % screenshot.get('thumbnail_vertical') * (image.shape[1] + 2 * border_size) + border_size
             concatenated_image[y_offset:y_offset + image.shape[0],
             x_offset:x_offset + image.shape[1]] = image
 
-        sv_path = str(os.path.join(screenshot.dir,filename.send_file_name()+".png"))
+        sv_path = str(os.path.join(screenshot.get('dir'),filename.send_file_name()+".png"))
         cv2.imwrite(sv_path, concatenated_image)
 
     except Exception as e:
-        print(f"发生异常: {e}")
-        return False, str(e)
+        logger.error(f"发生异常: {e}")
+        return False, ''
 
     finally:
         video_capture.release()
 
-    return sv_path
+    return True,sv_path
 
 
 def auto_upload(imageHost,proxyUrl,screenshot,video_path):
@@ -130,23 +131,21 @@ def auto_upload(imageHost,proxyUrl,screenshot,video_path):
         sv_path = get_thumbnails(video_path, screenshot)
         if sv_path:
             f = open(sv_path,'rb')
-            data = upload_screenshot(imageHost,f.read(),proxyUrl)
-            if data['url'] == '':
+            success,res = upload_screenshot(imageHost,f.read(),proxyUrl)
+            if not success:
                 print(f'{sv_path}图片上传失败')
             else:
-                img['thumbnail'] = data['url']
+                img['thumbnail'] = res
 
     pic = []
     for extracted in extracted_images:
         f = open(extracted, 'rb')
-        data = upload_screenshot(imageHost,f.read(),proxyUrl)
-        if data['url'] == '':
+        success,res = upload_screenshot(imageHost,f.read(),proxyUrl)
+        if not success:
             print(f'{extracted}图片上传失败')
         else:
-            pic.append(data['url'])
+            pic.append(res)
     img['extracted'] = pic
-
-    print(img)
 
     return img
 

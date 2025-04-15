@@ -11,18 +11,18 @@ from utils.festival import get_festival_blessing
 # 标准命名,返回文件夹的名称
 def standard_name(folder_path,cnName,enName,year,season,category,source,film_source='WEB-DL',team='GodDramas'):
     # 获取第一集的信息
-    if season < 10:
-        season = '0' + str(season)
+    if int(season) < 10:
+        season = '0' + season
     festival = get_festival_blessing()
     file_name = "{cnName}.{enName}.{year}.S{season}E???.{resolution}.{source}.{video_codec}.{audio_codec}-{team}"
     folder_name = "{cnName}.{enName}.{year}.S{season}.{resolution}.{source}.{video_codec}.{audio_codec}-{team}"
     video_files = get_video_files(folder_path)
     if len(video_files) == 0:
-        return ''
+        return None
     # 选择第一个视频，获取长宽
     video_info = get_video_info(video_files[0])
     if video_info is None:
-        return ''
+        return None
     file_name = file_name.format(cnName=cnName,enName=enName,year=year,season=season,
                                  resolution=video_info['resolution'],source=film_source,video_codec=video_info['video_codec'],
                                  audio_codec=video_info['audio_codec'],team=team)
@@ -30,11 +30,11 @@ def standard_name(folder_path,cnName,enName,year,season,category,source,film_sou
                                    resolution=video_info['resolution'],source=film_source,video_codec=video_info['video_codec'],
                                    audio_codec=video_info['audio_codec'],team=team)
     main_title = folder_name.replace('.',' ')
-    second_title = f"{cnName} | 全{len(video_files)}集 | {year}年 | {source} | 类型：{'/'.join(category)} {festival} "
+    second_title = f"{cnName} | 全{len(video_files)}集 | {year}年 | {source} | 类型：{category.replace(',','/')} {festival} "
     # 获取所有的视频文件，提取集数，拼接新名称，重命名
     video_files =  rename_video_files(video_files,file_name)
     if len(video_files) == 0:
-        return {}
+        return None
     # 重命名文件夹，返回新文件夹名称
     new_folder_path = rename_directory(folder_path,folder_name)
     return {
