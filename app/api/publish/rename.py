@@ -16,7 +16,6 @@ def rename():
                   data['season'],data['category'],data['source'],data['filmSource'],data['team'])
     if res is None:
         return util.json_server_error("服务器错误")
-    print(res)
     return util.json_success("成功",res)
 
 

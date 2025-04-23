@@ -33,8 +33,10 @@ CREATE TABLE IF NOT EXISTS site (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     type int NOT NULL UNIQUE,
-    cookie TEXT not null,
-    is_available BOOLEAN DEFAULT 1
+    cookie TEXT NOT NULL,
+    is_available BOOLEAN DEFAULT 1,
+    is_proxy BOOLEAN DEFAULT 0,
+    url TEXT NOT NULL
 );
 
 
@@ -81,7 +83,7 @@ CREATE TABLE IF NOT EXISTS configuration(
 );
 
 INSERT OR IGNORE INTO configuration(id ,image_host_id, pt_gen_id, screenshot_id, downloader_id, is_transfer, transfer_dir, proxy_url, torrent_path)
-VALUES (1,1,1,1,0,false,'','','')
+VALUES (1,1,1,1,0,false,'','','');
 
 CREATE TABLE IF NOT EXISTS publish_history(
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -110,7 +112,10 @@ CREATE TABLE IF NOT EXISTS publish_history(
     publish_info  TEXT NULL,
     mediaInfo  TEXT NULL,
     reference TEXT NULL,
-    first_file_name TEXT NULL
+    first_file_name TEXT NULL,
+    resolution TEXT NULL,
+    video_codec TEXT NULL,
+    audio_codec TEXT NULL
 );
 
 CREATE TABLE IF NOT EXISTS  publish_by_site(
@@ -119,7 +124,24 @@ CREATE TABLE IF NOT EXISTS  publish_by_site(
     site_type INTEGER NOT NULL,
     status INTEGER NOT NULL,
     error_msg TEXT NULL,
-    torrent_id INTEGER NULL
+    torrent_id INTEGER NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE TABLE IF NOT EXISTS publish_by_downloader(
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    publish_id INTEGER NOT NULL,
+    downloader_id INTEGER NOT NULL,
+    site_type INTEGER NOT NULL,
+    status INTEGER NOT NULL,
+    torrent_hash text NULL,
+    error_msg TEXT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+
 );
 
 -- 任务主表

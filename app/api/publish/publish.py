@@ -96,7 +96,6 @@ def log(task_id, q, message, level="INFO", step="general",data=None):
         q.put({'step': step, 'level': level, 'message': message,'data': data})
 
 def handle_task(app,task_id, form_data, q):
-    print(form_data)
     with app.app_context():
         task = None
         try:
@@ -264,6 +263,9 @@ def handle_task(app,task_id, form_data, q):
             form_data['videoFolder'] =  res['newFolderPath']
             form_data['firstFileName'] = res['firstFileName']
             form_data['publishInfo'] = publish_info
+            form_data['resolution'] = res['resolution']
+            form_data['video_codec'] = res['video_codec']
+            form_data['audio_codec'] = res['audio_codec']
             # 8、获取 Media 信息
             log(task_id, q, "开始获取 Media 信息...", step="media")
             media = get_media_info(form_data['firstFileName'])

@@ -27,25 +27,25 @@ def get_path():
         return util.json_success("成功",dir_map)
 
 
-# @info_api.route("/",methods=['GET'])
-# def get_configuration():
-#     configuration = Config.query.get(1)
-#     if configuration is None:
-#         return util.json_params_error("查询失败，联系管理员吧")
-#     return util.json_success("成功", configuration.to_dict())
-#
-#
-# @info_api.route("/<int:config_id>",methods=['PUT'])
-# def update_configuration(config_id):
-#     data = request.get_json()
-#     configuration = Config.query.get(config_id)
-#     if configuration is None:
-#         return util.json_params_error("更新失败，联系管理员吧")
-#     for key, value in data.items():
-#         if hasattr(configuration, key):
-#             setattr(configuration, key, value)
-#     db.session.commit()
-#     return util.json_success("成功", configuration.to_dict())
+@info_api.route("/",methods=['GET'])
+def get_configuration():
+    configuration = Config.query.get(1)
+    if configuration is None:
+        return util.json_params_error("查询失败，联系管理员吧")
+    return util.json_success("成功", configuration.to_dict())
+
+
+@info_api.route("/<int:config_id>",methods=['PUT'])
+def update_configuration(config_id):
+    data = request.get_json()
+    configuration = Config.query.get(config_id)
+    if configuration is None:
+        return util.json_params_error("更新失败，联系管理员吧")
+    for key, value in data.items():
+        if hasattr(configuration, key):
+            setattr(configuration, key, value)
+    db.session.commit()
+    return util.json_success("成功", configuration.to_dict())
 
 
 

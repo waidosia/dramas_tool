@@ -55,6 +55,8 @@ class Site(db.Model):
     type = db.Column(db.Integer, nullable=False,unique= True )
     cookie = db.Column(db.String(255), nullable=False)
     is_available = db.Column(db.Boolean, default=True)
+    is_proxy = db.Column(db.Boolean, default=False)
+    url = db.Column(db.String(255), nullable=False)
     def __repr__(self):
         return self.name
 
@@ -64,7 +66,9 @@ class Site(db.Model):
             'name': self.name,
             'type': self.type,
             'cookie': self.cookie,
-            'is_available': self.is_available
+            'is_available': self.is_available,
+            'is_proxy': self.is_proxy,
+            'url': self.url
         }
 
 

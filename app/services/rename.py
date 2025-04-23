@@ -42,6 +42,11 @@ def standard_name(folder_path,cnName,enName,year,season,category,source,film_sou
         'firstFileName': video_files[0],
         'mainTitle' : main_title,
         'subTitle' : second_title,
+        # 视频的分辨率，编码
+        # 音频编码
+        'resolution':"video_info['resolution']",
+        'video_codec':"video_info['video_codec']",
+        'audio_codec':"video_info['audio_codec']",
     }
 
 

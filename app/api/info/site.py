@@ -20,7 +20,6 @@ def add_site():
         db.session.commit()
     except Exception as e:
         # 如果是唯一索引冲突引发的异常
-        print(str(e))
         if "UNIQUE constraint" in str(e):
             return util.json_params_error("该站点已存在.")
         else:

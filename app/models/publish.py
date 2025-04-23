@@ -1,5 +1,3 @@
-
-
 from app.extension import db
 
 class Publish(db.Model):
@@ -30,9 +28,12 @@ class Publish(db.Model):
     publish_info =db.Column(db.String(100), nullable=False)
     mediaInfo =db.Column(db.String(100), nullable=False)
     first_file_name = db.Column(db.String(100), nullable=False)
+    resolution = db.Column(db.String(100), nullable=False)
+    video_codec = db.Column(db.String(100), nullable=False)
+    audio_codec = db.Column(db.String(100), nullable=False)
+    sites = db.relationship("PublishForSite", backref="publish", lazy="joined")
+    downloaders = db.relationship("PublishForDownloader", backref="publish", lazy="joined")
 
-    def __repr__(self):
-        return self.name
 
     def to_dict(self):
         return {
@@ -60,5 +61,51 @@ class Publish(db.Model):
         'publishInfo': self.publish_info,
         'mediaInfo':  self.mediaInfo,
         'firstFileName': self.first_file_name,
+        'sites': [site.to_dict() for site in self.sites],
+        'downloaders': [downloader.to_dict() for downloader in self.downloaders]
         }
 
+
+
+class PublishForSite(db.Model):
+    __tablename__ = 'publish_by_site'
+    id = db.Column(db.Integer, primary_key=True)
+    publish_id = db.Column(db.Integer, db.ForeignKey('publish_history.id'), nullable=False)
+    site_type = db.Column(db.Integer,nullable=False)
+    status = db.Column(db.Integer,nullable=False)
+    error_msg= db.Column(db.String(100), nullable=False)
+    torrent_id=db.Column(db.Integer,nullable=False)
+
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'publish_id': self.publish_id,
+            'site_type': self.site_type,
+            'status': self.status,
+            'error_msg': self.error_msg,
+            'torrent_id': self.torrent_id,
+        }
+
+
+
+class PublishForDownloader(db.Model):
+    __tablename__ = 'publish_by_downloader'
+    id = db.Column(db.Integer, primary_key=True)
+    publish_id = db.Column(db.Integer, db.ForeignKey('publish_history.id'), nullable=False)
+    site_type = db.Column(db.Integer, nullable=False)
+    status = db.Column(db.Integer, nullable=False)
+    error_msg = db.Column(db.String(100), nullable=False)
+    downloader_id = db.Column(db.Integer,nullable=False)
+    torrent_hash=db.Column(db.String(100),nullable=False)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'publish_id': self.publish_id,
+            'site_type': self.site_type,
+            'status': self.status,
+            'error_msg': self.error_msg,
+            'downloader_type': self.downloader_id,
+            'torrent_hash': self.torrent_hash,
+        }
