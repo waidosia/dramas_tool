@@ -67,7 +67,6 @@ def rename_file_with_same_extension(old_name, new_name_without_extension) -> tup
     """
     try:
         if not os.path.exists(old_name):
-            print(f"未找到文件: '{old_name}'")
             return False, f"未找到文件: '{old_name}'"
 
         file_dir, file_base = os.path.split(old_name)

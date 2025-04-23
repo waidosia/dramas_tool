@@ -13,7 +13,6 @@ def fetch_ptgen_data(api_url, resource_url) -> (bool,dict):
             response = requests.get(f"{api_url}?url={resource_url}", timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                print(data)
                 # 封面: data['poster']
                 douban_info['poster'] = data.get('poster','')
                 # format信息
